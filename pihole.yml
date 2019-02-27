@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole-deployment
+  labels:
+    app: pihole
+    purpose: example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+      purpose: dns
+  template:
+    metadata:
+      labels:
+        app: pihole
+        purpose: dns
+    spec:
+      hostAliases:
+      - ip: "192.168.10.1"
+        hostnames:
+        - "router.example.net"
+      - ip: "192.168.10.10"
+        hostnames:
+        - "printer.example.net"
+      containers:
+      - name: pihole-dns
+        image: pihole/pihole:4.2.2_armhf
+        env:
+        - name: TZ
+          value: 'America/Denver'
+        - name: WEBPASSWORD
+          value: password
+        ports:
+        - containerPort: 53
+          protocol: UDP
+        - containerPort: 80
+        - containerPort: 443
+        - containerPort: 67
